@@ -15,12 +15,15 @@ Quick usage:
 <?php
 use CharacterEncoder\EncoderFactory;
 
+$sample = 'The quick brown fox jumps over the lazy dog';
+
 $encodings = array('utf-8', 'EUC-JP', 'ISO-8859-1');
 $encoder = EncoderFactory::create($encodings);
 
-$detected = $encoder->detect($some_text);
+// Returns false if the encoding could not be detected.
+$detected = $encoder->detect($sample);
 
-$utf8_text = $encoder->convertToUtf8($some_text, $detected);
+$utf8 = $encoder->convertToUtf8($sample, $detected);
 
-$iso_text = $encoder->convertEncoding($some_text, $detected, 'ISO-8859-1');
+$iso = $encoder->convertEncoding($sample, $detected, 'ISO-8859-1');
 ```
