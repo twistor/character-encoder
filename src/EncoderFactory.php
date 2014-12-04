@@ -26,15 +26,12 @@ class EncoderFactory {
     if (extension_loaded('mbstring')) {
       $encoder = new MbEncoder();
     }
-
     elseif (extension_loaded('iconv')) {
       $encoder = new IconvEncoder();
     }
-
     elseif (extension_loaded('recode')) {
       $encoder = new RecodeEncoder();
     }
-
     // No text encoding library found.
     else {
       $encoder = new NoopEncoder();

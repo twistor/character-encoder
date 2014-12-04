@@ -8,7 +8,7 @@
 namespace CharacterEncoder;
 
 /**
- * Character encoding using the iconv extension.
+ * Character encoding using the recode extension.
  */
 class RecodeEncoder extends EncoderBase {
 
