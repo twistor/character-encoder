@@ -51,6 +51,23 @@ abstract class EncoderTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
+   * @covers \CharacterEncoder\EncoderBase
+   * @dataProvider textProvder
+   */
+  public function testConvertToUtf8($string, $encoding) {
+    $encoder = $this->newEncoder();
+    $encoder->setEncodings(array('UTF-8', 'ascii', 'EUC-JP'));
+
+    $this->assertSame(array('UTF-8', 'ascii', 'EUC-JP'), $encoder->getEncodings());
+
+    $content = file_get_contents(dirname(__FILE__) . '/../test-resources/euc-jp.txt');
+    $this->assertSame(mb_convert_encoding($content, 'utf-8', 'EUC-JP'), $encoder->convertToUtf8($content));
+
+    $content = file_get_contents(dirname(__FILE__) . '/../test-resources/cp866.txt');
+    $this->assertFalse($encoder->convertToUtf8($content));
+  }
+
+  /**
    * Text content provider.
    */
   public function textProvder() {

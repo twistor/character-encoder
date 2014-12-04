@@ -59,12 +59,10 @@ interface Encoder {
    *
    * @param string $string
    *   The string to convert.
-   * @param string $from
-   *   The encoding of the string.
    *
    * @return string|bool
    *   The encoded string, or false if the conversion failed.
    */
-  public function convertToUtf8($string, $from);
+  public function convertToUtf8($string);
 
 }

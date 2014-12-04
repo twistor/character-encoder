@@ -36,8 +36,12 @@ abstract class EncoderBase implements Encoder {
   /**
    * {@inheritdoc}
    */
-  public function convertToUtf8($string, $from) {
-    return $this->convertEncoding($string, $from, 'utf-8');
+  public function convertToUtf8($string) {
+    if ($detected = $this->detectEncoding($string)) {
+      return $this->convertEncoding($string, $detected, 'utf-8');
+    }
+
+    return FALSE;
   }
 
 }
