@@ -16,26 +16,33 @@ class EncoderFactory {
    * Returns the best encoder for the system.
    *
    * @param array $encoding_list
-   *   The list of encodings to search through.
+   *   (optional) The list of encodings to search through. Defaults to an empty
+   *   array.
    *
    * @return \CharacterEncoder\Encoder
    *   A character encoder.
    */
-  public static function create(array $encoding_list) {
+  public static function create(array $encoding_list = array()) {
     if (extension_loaded('mbstring')) {
-      return new MbEncoder($encoding_list);
+      $encoder = new MbEncoder();
     }
 
-    if (extension_loaded('iconv')) {
-      return new IconvEncoder($encoding_list);
+    elseif (extension_loaded('iconv')) {
+      $encoder = new IconvEncoder();
     }
 
-    if (extension_loaded('recode')) {
-      return new RecodeEncoder($encoding_list);
+    elseif (extension_loaded('recode')) {
+      $encoder = new RecodeEncoder();
     }
 
     // No text encoding library found.
-    return new NoopEncoder($encoding_list);
+    else {
+      $encoder = new NoopEncoder();
+    }
+
+    $encoder->setEncodings($encoding_list);
+
+    return $encoder;
   }
 
 }

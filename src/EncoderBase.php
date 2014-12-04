@@ -17,7 +17,7 @@ abstract class EncoderBase implements Encoder {
    *
    * @var array
    */
-  private $encodings;
+  private $encodings = array();
 
   /**
    * {@inheritdoc}
@@ -37,7 +37,7 @@ abstract class EncoderBase implements Encoder {
    * {@inheritdoc}
    */
   public function convertToUtf8($string, $from) {
-    return $this->convertEncoding($string, $from, 'utf-8')
+    return $this->convertEncoding($string, $from, 'utf-8');
   }
 
 }

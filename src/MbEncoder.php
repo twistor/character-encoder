@@ -16,10 +16,10 @@ class MbEncoder extends EncoderBase {
    * {@inheritdoc}
    */
   public function detectEncoding($string) {
-    if ($detected = mb_detect_encoding($string, $this->encodingList, TRUE)) {
+    if ($detected = mb_detect_encoding($string, $this->getEncodings(), TRUE)) {
       return $detected;
     }
-    return mb_detect_encoding($string, $this->encodingList);
+    return mb_detect_encoding($string, $this->getEncodings());
   }
 
   /**
