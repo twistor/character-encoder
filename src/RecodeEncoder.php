@@ -34,7 +34,7 @@ class RecodeEncoder extends EncoderBase {
   /**
    * {@inheritdoc}
    */
-  public function convertEncoding($string, $from, $to) {
+  public function convert($string, $from, $to) {
     return recode_string($from . '..' . $to, $string);
   }
 

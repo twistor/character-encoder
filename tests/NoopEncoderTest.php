@@ -17,7 +17,7 @@ class NoopEncoderTest extends \PHPUnit_Framework_TestCase {
   public function test() {
     $encoder = new NoopEncoder();
     $this->assertFalse($encoder->detectEncoding('asdff'));
-    $this->assertSame('asdf', $encoder->convertEncoding('asdf', 'ascii', 'ascii'));
+    $this->assertSame('asdf', $encoder->convert('asdf', 'ascii', 'ascii'));
   }
 
 }

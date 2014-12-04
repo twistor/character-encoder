@@ -25,7 +25,7 @@ class MbEncoder extends EncoderBase {
   /**
    * {@inheritdoc}
    */
-  public function convertEncoding($string, $from, $to) {
+  public function convert($string, $from, $to) {
     return mb_convert_encoding($string, $to, $from);
   }
 

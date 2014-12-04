@@ -47,7 +47,7 @@ abstract class EncoderTest extends \PHPUnit_Framework_TestCase {
   public function testConvert($string, $encoding) {
     $encoder = $this->newEncoder();
     $expected = mb_convert_encoding($string, 'utf-8', $encoding);
-    $this->assertEquals($expected, $encoder->convertEncoding($string, $encoding, 'utf-8'));
+    $this->assertEquals($expected, $encoder->convert($string, $encoding, 'utf-8'));
   }
 
   /**
@@ -61,10 +61,10 @@ abstract class EncoderTest extends \PHPUnit_Framework_TestCase {
     $this->assertSame(array('UTF-8', 'ascii', 'EUC-JP'), $encoder->getEncodings());
 
     $content = file_get_contents(dirname(__FILE__) . '/../test-resources/euc-jp.txt');
-    $this->assertSame(mb_convert_encoding($content, 'utf-8', 'EUC-JP'), $encoder->convertToUtf8($content));
+    $this->assertSame(mb_convert_encoding($content, 'utf-8', 'EUC-JP'), $encoder->toUtf8($content));
 
     $content = file_get_contents(dirname(__FILE__) . '/../test-resources/cp866.txt');
-    $this->assertFalse($encoder->convertToUtf8($content));
+    $this->assertFalse($encoder->toUtf8($content));
   }
 
   /**

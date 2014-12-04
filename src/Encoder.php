@@ -52,7 +52,7 @@ interface Encoder {
    * @return string|bool
    *   The encoded string, or false if the conversion failed.
    */
-  public function convertEncoding($string, $from, $to);
+  public function convert($string, $from, $to);
 
   /**
    * Converts a string to utf-8.
@@ -63,6 +63,6 @@ interface Encoder {
    * @return string|bool
    *   The encoded string, or false if the conversion failed.
    */
-  public function convertToUtf8($string);
+  public function toUtf8($string);
 
 }

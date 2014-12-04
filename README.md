@@ -22,12 +22,12 @@ $encodings = array('utf-8', 'EUC-JP', 'ISO-8859-1');
 $encoder = EncoderFactory::create($encodings);
 
 // Convert text to utf-8. Returns false if the encoding could not be detected.
-$utf8 = $encoder->convertToUtf8($sample);
+$utf8 = $encoder->toUtf8($sample);
 
 // Advanced usage.
 
 // Returns false if the encoding could not be detected.
 $detected = $encoder->detect($sample);
 
-$iso = $encoder->convertEncoding($sample, $detected, 'ISO-8859-1');
+$iso = $encoder->convert($sample, $detected, 'ISO-8859-1');
 ```
