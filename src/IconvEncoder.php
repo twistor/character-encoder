@@ -10,26 +10,27 @@ namespace CharacterEncoder;
 /**
  * Character encoding using the iconv extension.
  */
-class IconvEncoder extends EncoderBase {
+class IconvEncoder extends EncoderBase
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function detectEncoding($string)
+    {
+        foreach ($this->getEncodings() as $encoding) {
+            if (@iconv($encoding, $encoding, $string) === $string) {
+                return $encoding;
+            }
+        }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function detectEncoding($string) {
-    foreach ($this->getEncodings() as $encoding) {
-      if (@iconv($encoding, $encoding, $string) === $string) {
-        return $encoding;
-      }
+        return false;
     }
 
-    return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function convert($string, $from, $to) {
-    return @iconv($from, $to, $string);
-  }
-
+    /**
+     * {@inheritdoc}
+     */
+    public function convert($string, $from, $to)
+    {
+        return @iconv($from, $to, $string);
+    }
 }

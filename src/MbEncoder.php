@@ -10,23 +10,25 @@ namespace CharacterEncoder;
 /**
  * Character encoding using the mbstring extension.
  */
-class MbEncoder extends EncoderBase {
+class MbEncoder extends EncoderBase
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function detectEncoding($string)
+    {
+        if ($detected = mb_detect_encoding($string, $this->getEncodings(), true)) {
+            return $detected;
+        }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function detectEncoding($string) {
-    if ($detected = mb_detect_encoding($string, $this->getEncodings(), TRUE)) {
-      return $detected;
+        return mb_detect_encoding($string, $this->getEncodings());
     }
-    return mb_detect_encoding($string, $this->getEncodings());
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function convert($string, $from, $to) {
-    return mb_convert_encoding($string, $to, $from);
-  }
-
+    /**
+     * {@inheritdoc}
+     */
+    public function convert($string, $from, $to)
+    {
+        return mb_convert_encoding($string, $to, $from);
+    }
 }

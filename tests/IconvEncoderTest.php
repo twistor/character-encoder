@@ -12,8 +12,7 @@ use CharacterEncoder\IconvEncoder;
 /**
  * @covers \CharacterEncoder\IconvEncoder
  */
-class IconvEncoderTest extends EncoderTest {
-
-  protected $encoderClass = 'CharacterEncoder\IconvEncoder';
-
+class IconvEncoderTest extends EncoderTest
+{
+    protected $encoderClass = 'CharacterEncoder\IconvEncoder';
 }

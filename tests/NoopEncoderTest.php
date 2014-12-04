@@ -12,12 +12,12 @@ use CharacterEncoder\NoopEncoder;
 /**
  * @covers \CharacterEncoder\NoopEncoder
  */
-class NoopEncoderTest extends \PHPUnit_Framework_TestCase {
-
-  public function test() {
-    $encoder = new NoopEncoder();
-    $this->assertFalse($encoder->detectEncoding('asdff'));
-    $this->assertSame(FALSE, $encoder->convert('asdf', 'ascii', 'ascii'));
-  }
-
+class NoopEncoderTest extends \PHPUnit_Framework_TestCase
+{
+    public function test()
+    {
+        $encoder = new NoopEncoder();
+        $this->assertFalse($encoder->detectEncoding('asdff'));
+        $this->assertSame(false, $encoder->convert('asdf', 'ascii', 'ascii'));
+    }
 }
