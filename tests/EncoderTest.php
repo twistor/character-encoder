@@ -68,6 +68,17 @@ abstract class EncoderTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
+   * @covers \CharacterEncoder\EncoderBase
+   */
+  public function testCompatible() {
+    $encoder = $this->newEncoder();
+    $encoder->setEncodings(array('ascii'));
+
+    $content = file_get_contents(dirname(__FILE__) . '/../test-resources/ascii.txt');
+    $this->assertSame($content, $encoder->toUtf8($content));
+  }
+
+  /**
    * Text content provider.
    */
   public function textProvder() {

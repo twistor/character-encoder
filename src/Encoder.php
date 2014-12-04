@@ -15,7 +15,7 @@ interface Encoder {
   /**
    * Returns the current list of encodings being checked.
    *
-   * @return array
+   * @return []string
    *   A list of character encodings.
    */
   public function getEncodings();

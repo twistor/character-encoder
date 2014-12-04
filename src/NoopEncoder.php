@@ -23,7 +23,7 @@ class NoopEncoder extends EncoderBase {
    * {@inheritdoc}
    */
   public function convert($string, $from, $to) {
-    return $string;
+    return FALSE;
   }
 
 }
