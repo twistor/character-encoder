@@ -53,7 +53,7 @@ abstract class EncoderBase implements Encoder
      */
     public function toUtf8($string)
     {
-        if (!$detected = $this->detectEncoding($string)) {
+        if (!$detected = $this->detect($string)) {
             return false;
         }
 

@@ -15,7 +15,7 @@ class MbEncoder extends EncoderBase
     /**
      * {@inheritdoc}
      */
-    public function detectEncoding($string)
+    public function detect($string)
     {
         if ($detected = mb_detect_encoding($string, $this->getEncodings(), true)) {
             return $detected;

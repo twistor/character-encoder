@@ -10,14 +10,14 @@ namespace CharacterEncoder\Tests;
 /**
  * Base class for encoders.
  *
- * Each encoder is an instance of this class ensuring that the behavior is the
- * same for each encoder.
+ * Each encoder test is an instance of this class ensuring that the behavior is
+ * the same for every encoder.
  */
 abstract class EncoderTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * The tested encodings.
+     * The encodings to test.
      *
      * @var []string
      */
@@ -25,6 +25,10 @@ abstract class EncoderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Returns a new encoder.
+     *
+     * Subclasses set self::$encoderClass to their class.
+     *
+     * @return \CharacterEncoder\Encoder
      */
     protected function newEncoder()
     {
@@ -33,26 +37,32 @@ abstract class EncoderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests encoding detection.
+     *
      * @dataProvider textProvder
      */
     public function testsDetect($string, $encoding)
     {
         $encoder = $this->newEncoder();
         $encoder->setEncodings(array('UTF-8', 'EUC-JP', 'CP866'));
-        $this->assertEquals($encoding, $encoder->detectEncoding($string));
+        $this->assertEquals($encoding, $encoder->detect($string));
     }
 
     /**
+     * Tests invalid encoding detection.
+     *
      * @dataProvider textProvder
      */
     public function testsEncodingNotFound($string, $encoding)
     {
         $encoder = $this->newEncoder();
         $encoder->setEncodings(array('ascii'));
-        $this->assertEquals(false, $encoder->detectEncoding($string));
+        $this->assertFalse($encoder->detect($string));
     }
 
     /**
+     * Tests encoding conversion.
+     *
      * @dataProvider textProvder
      */
     public function testConvert($string, $encoding)
@@ -63,6 +73,8 @@ abstract class EncoderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests automatic utf-8 conversion.
+     *
      * @covers \CharacterEncoder\EncoderBase
      * @dataProvider textProvder
      */
@@ -81,6 +93,8 @@ abstract class EncoderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the quick utf-8 conversion method.
+     *
      * @covers \CharacterEncoder\EncoderBase
      */
     public function testCompatible()
@@ -93,7 +107,9 @@ abstract class EncoderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Text content provider.
+     * Provides encoded strings.
+     *
+     * @return array An array($content, $encoding)
      */
     public function textProvder()
     {

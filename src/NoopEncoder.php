@@ -15,7 +15,7 @@ class NoopEncoder extends EncoderBase
     /**
      * {@inheritdoc}
      */
-    public function detectEncoding($string)
+    public function detect($string)
     {
         return false;
     }

@@ -33,7 +33,7 @@ interface Encoder
      *
      * @return string|bool The detected character encoding, or false if it couldn't be determined.
      */
-    public function detectEncoding($string);
+    public function detect($string);
 
     /**
      * Converts a string from an encoding to an encoding.
