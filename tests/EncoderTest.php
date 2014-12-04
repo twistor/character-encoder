@@ -90,18 +90,9 @@ abstract class EncoderTest extends \PHPUnit_Framework_TestCase
 
         $content = file_get_contents(dirname(__FILE__).'/../test-resources/cp866.txt');
         $this->assertFalse($encoder->toUtf8($content));
-    }
 
-    /**
-     * Tests the quick utf-8 conversion method.
-     *
-     * @covers \CharacterEncoder\EncoderBase
-     */
-    public function testCompatible()
-    {
-        $encoder = $this->newEncoder();
+        // Test short curcuit.
         $encoder->setEncodings(array('ascii'));
-
         $content = file_get_contents(dirname(__FILE__).'/../test-resources/ascii.txt');
         $this->assertSame($content, $encoder->toUtf8($content));
     }

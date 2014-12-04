@@ -15,7 +15,7 @@ class EncoderFactory
     /**
      * Returns the best encoder for the system.
      *
-     * @param []string $encoding_list Encodings to search through.
+     * @param []string $encoding_list (optional) Encodings to search through.
      *
      * @return \CharacterEncoder\Encoder A character encoder.
      */

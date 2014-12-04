@@ -20,15 +20,16 @@ class RecodeEncoder extends EncoderBase
         foreach ($this->getEncodings() as $encoding) {
             // recode_string() from..to the same encoding is a noop, so we have
             // to do this dance.
-            $to = strtolower($encoding) === 'utf-8' ? 'utf-16' : 'utf-8';
+            $to = strtolower($encoding) !== 'utf-8' ? 'utf-8' : 'utf-16';
 
+            // Reuse the same variable to attempt to keep the memory usage down.
             $encoded = recode_string($encoding.'..'.$to, $string);
-            $decoded = recode_string($to.'..'.$encoding, $encoded);
-            if ($decoded === $string) {
+            $encoded = recode_string($to.'..'.$encoding, $encoded);
+
+            if ($encoded === $string) {
                 return $encoding;
             }
         }
-
         return false;
     }
 
