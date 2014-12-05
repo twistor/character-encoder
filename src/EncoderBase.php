@@ -51,6 +51,20 @@ abstract class EncoderBase implements Encoder
     /**
      * {@inheritdoc}
      */
+    public function detect($string)
+    {
+        foreach ($this->getEncodings() as $encoding) {
+            if ($this->check($string, $encoding)) {
+                return $encoding;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function detectFile($handle, $length = 524288)
     {
         fseek($handle, 0);

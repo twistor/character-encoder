@@ -15,13 +15,8 @@ class MbEncoder extends EncoderBase
     /**
      * {@inheritdoc}
      */
-    public function detect($string)
-    {
-        if ($detected = mb_detect_encoding($string, $this->getEncodings(), true)) {
-            return $detected;
-        }
-
-        return mb_detect_encoding($string, $this->getEncodings());
+    public function check($string, $encoding) {
+        return mb_check_encoding($string, $encoding);
     }
 
     /**
@@ -29,10 +24,6 @@ class MbEncoder extends EncoderBase
      */
     public function convert($string, $from, $to)
     {
-        if (mb_check_encoding($string, $from)) {
-            return mb_convert_encoding($string, $to, $from);
-        }
-
-        return false;
+        return mb_convert_encoding($string, $to, $from);
     }
 }

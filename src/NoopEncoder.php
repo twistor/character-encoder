@@ -15,7 +15,7 @@ class NoopEncoder extends EncoderBase
     /**
      * {@inheritdoc}
      */
-    public function detect($string)
+    public function check($string, $encoding)
     {
         return false;
     }
@@ -25,6 +25,6 @@ class NoopEncoder extends EncoderBase
      */
     public function convert($string, $from, $to)
     {
-        return false;
+        return '';
     }
 }

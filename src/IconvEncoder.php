@@ -15,15 +15,9 @@ class IconvEncoder extends EncoderBase
     /**
      * {@inheritdoc}
      */
-    public function detect($string)
+    public function check($string, $encoding)
     {
-        foreach ($this->getEncodings() as $encoding) {
-            if (@iconv($encoding, $encoding, $string) === $string) {
-                return $encoding;
-            }
-        }
-
-        return false;
+        return @iconv($encoding, $encoding, $string) === $string;
     }
 
     /**
@@ -31,6 +25,6 @@ class IconvEncoder extends EncoderBase
      */
     public function convert($string, $from, $to)
     {
-        return @iconv($from, $to, $string);
+        return (string) @iconv($from, $to, $string);
     }
 }
