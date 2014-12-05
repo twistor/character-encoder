@@ -29,6 +29,10 @@ class MbEncoder extends EncoderBase
      */
     public function convert($string, $from, $to)
     {
-        return mb_convert_encoding($string, $to, $from);
+        if (mb_check_encoding($string, $from)) {
+            return mb_convert_encoding($string, $to, $from);
+        }
+
+        return false;
     }
 }

@@ -15,7 +15,6 @@ namespace CharacterEncoder\Tests;
  */
 abstract class EncoderTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * The encodings to test.
      *
@@ -33,6 +32,7 @@ abstract class EncoderTest extends \PHPUnit_Framework_TestCase
     protected function newEncoder()
     {
         $class = $this->encoderClass;
+
         return new $class();
     }
 
@@ -41,7 +41,7 @@ abstract class EncoderTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider textProvder
      */
-    public function testsDetect($string, $encoding)
+    public function testDetect($string, $encoding)
     {
         $encoder = $this->newEncoder();
         $encoder->setEncodings(array('UTF-8', 'EUC-JP', 'CP866'));
@@ -49,11 +49,26 @@ abstract class EncoderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests file encoding detection.
+     *
+     * @covers \CharacterEncoder\EncoderBase
+     * @dataProvider fileProvder
+     */
+    public function testDetectFile($handle, $encoding)
+    {
+        $encoder = $this->newEncoder();
+        $encoder->setEncodings(array('UTF-8', 'EUC-JP', 'CP866'));
+        $this->assertEquals($encoding, $encoder->detectFile($handle));
+
+        fclose($handle);
+    }
+
+    /**
      * Tests invalid encoding detection.
      *
      * @dataProvider textProvder
      */
-    public function testsEncodingNotFound($string, $encoding)
+    public function testEncodingNotFound($string, $encoding)
     {
         $encoder = $this->newEncoder();
         $encoder->setEncodings(array('ascii'));
@@ -70,6 +85,24 @@ abstract class EncoderTest extends \PHPUnit_Framework_TestCase
         $encoder = $this->newEncoder();
         $expected = mb_convert_encoding($string, 'utf-8', $encoding);
         $this->assertEquals($expected, $encoder->convert($string, $encoding, 'utf-8'));
+    }
+
+    /**
+     * Tests file encoding conversion.
+     *
+     * @covers \CharacterEncoder\EncoderBase
+     * @dataProvider fileProvder
+     */
+    public function testConvertFile($handle, $encoding)
+    {
+        $encoder = $this->newEncoder();
+        $expected = mb_convert_encoding(stream_get_contents($handle), 'utf-8', $encoding);
+        $new = $encoder->convertFile($handle, $encoding, 'utf-8');
+
+        $this->assertSame($expected, stream_get_contents($new));
+
+        fclose($new);
+        fclose($handle);
     }
 
     /**
@@ -110,6 +143,24 @@ abstract class EncoderTest extends \PHPUnit_Framework_TestCase
         foreach ($this->testEncodings as $encoding) {
             $content = file_get_contents($prefix.strtolower($encoding).'.txt');
             $return[] = array($content, $encoding);
+        }
+
+        return $return;
+    }
+
+    /**
+     * Provides encoded file handles.
+     *
+     * @return array An array($handle, $encoding)
+     */
+    public function fileProvder()
+    {
+        $prefix = dirname(__FILE__).'/../test-resources/';
+
+        $return = array();
+        foreach ($this->testEncodings as $encoding) {
+            $handle = fopen($prefix.strtolower($encoding).'.txt', 'rw');
+            $return[] = array($handle, $encoding);
         }
 
         return $return;

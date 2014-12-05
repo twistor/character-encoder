@@ -51,6 +51,39 @@ abstract class EncoderBase implements Encoder
     /**
      * {@inheritdoc}
      */
+    public function detectFile($handle, $length = 524288)
+    {
+        fseek($handle, 0);
+        $encoding = $this->detect(fread($handle, $length));
+        fseek($handle, 0);
+
+        return $encoding;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function convertFile($handle, $from, $to)
+    {
+        fseek($handle, 0);
+        $output = fopen('php://temp', 'w+');
+
+        // Encode one line at a time.
+        // We can't just read a big buffer of bytes since it might split in the
+        // middle of a multi-byte character. Newline is safe to split on.
+        while ($buffer = fgets($handle)) {
+            fwrite($output, $this->convert($buffer, $from, $to));
+        }
+
+        fseek($handle, 0);
+        fseek($output, 0);
+
+        return $output;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function toUtf8($string)
     {
         if (!$detected = $this->detect($string)) {

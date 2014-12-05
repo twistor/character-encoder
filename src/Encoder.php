@@ -36,6 +36,16 @@ interface Encoder
     public function detect($string);
 
     /**
+     * Detects the encoding of a file.
+     *
+     * @param resource $handle A file handle.
+     * @param int      $length The length of file to read in bytes. Defaults to 0.5MB.
+     *
+     * @return string|bool The detected character encoding, or false if it couldn't be determined.
+     */
+    public function detectFile($handle, $length = 524288);
+
+    /**
      * Converts a string from an encoding to an encoding.
      *
      * @param string $string The string to convert.
@@ -45,6 +55,17 @@ interface Encoder
      * @return string|bool The encoded string, or false if the conversion failed.
      */
     public function convert($string, $from, $to);
+
+    /**
+     * Converts a file from one encoding to another.
+     *
+     * @param resource $handle A file handle.
+     * @param string   $from   The encoding of the string.
+     * @param string   $to     The desired encoding of the string.
+     *
+     * @return resource A new file handle with the encoded text.
+     */
+    public function convertFile($handle, $from, $to);
 
     /**
      * Converts a string to utf-8.
