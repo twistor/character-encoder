@@ -113,4 +113,14 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
         fclose($stream);
         fclose($converted);
     }
+
+    public function testGetMimeType()
+    {
+        $encoder = new Encoder(new Noop());
+        $class = new \ReflectionClass($encoder);
+        $method = $class->getMethod('getMimeTypeFromHeader');
+        $method->setAccessible(true);
+        $this->assertSame('text/plain', $method->invokeArgs($encoder, array('text/plain')));
+        $this->assertSame('text/plain', $method->invokeArgs($encoder, array('text/plain; charset=ascii')));
+    }
 }

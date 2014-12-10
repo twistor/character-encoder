@@ -26,22 +26,44 @@ class EncoderFactory
      */
     public static function create(array $encoding_list = array())
     {
+        $encoder = new Encoder(static::getAdapter());
+        $encoder->setEncodings($encoding_list);
+        return $encoder;
+    }
+
+    /**
+     * Returns the best encoder for the system.
+     *
+     * @param \CharacterEncoder\Encoder $encoder An optional encoder to use.
+     *
+     * @return \CharacterEncoder\Encoder A character encoder.
+     */
+    public static function createXmlEncoder(Encoder $encoder = NULL)
+    {
+        if (!$encoder) {
+            $encoder = static::create();
+        }
+        return new XmlEncoder();
+    }
+
+    /**
+     * Returns the adapter based on the environment.
+     *
+     * @return \CharacterEncoder\Adapter\Adapter A new adapter.
+     */
+    protected static function getAdapter()
+    {
         if (extension_loaded('mbstring')) {
-            $adapter = new MbString();
+            return new MbString();
         }
         // @codeCoverageIgnoreStart
         elseif (extension_loaded('iconv')) {
-            $adapter = new Iconv();
+            return new Iconv();
         } elseif (extension_loaded('recode')) {
-            $adapter = new Recode();
+            return new Recode();
         } else {
-            $adapter = new Noop();
+            return new Noop();
         }
         // @codeCoverageIgnoreEnd
-
-        $encoder = new Encoder($adapter);
-        $encoder->setEncodings($encoding_list);
-
-        return $encoder;
     }
 }

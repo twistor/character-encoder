@@ -95,6 +95,7 @@ abstract class AdapterTestBase extends \PHPUnit_Framework_TestCase
     protected function newAdapter()
     {
         $class = $this->adapterClass;
+
         return new $class();
     }
 }

@@ -250,7 +250,7 @@ class Encoder
      *
      * @return string|bool The BOM identifier, or false if one wasn't found.
      */
-    protected function getBomFromString($string)
+    public function getBomFromString($string)
     {
         // Search for a BOM signature from largest to smallest.
         foreach (range(5, 2) as $bom_len) {
@@ -273,7 +273,7 @@ class Encoder
      *
      * @return string|bool The BOM identifier, or false if one wasn't found.
      */
-    protected function getBomFromStream($stream)
+    public function getBomFromStream($stream)
     {
         fseek($stream, 0);
         $bom = $this->getBomFromString(fread($stream, 5));
@@ -292,12 +292,30 @@ class Encoder
      *
      * @return string|bool The charset, or false if not found.
      */
-    protected function getCharset($contentType)
+    public function getCharset($contentType)
     {
-        if (preg_match('/charset\s*=\s*(.*)\b/', $contentType, $matches)) {
-            return $matches[1];
+        if (preg_match('/charset\s*=\s*(.*);?/', $contentType, $matches)) {
+            return trim($matches[1]);
         }
 
         return false;
+    }
+
+    /**
+     * Returns the mime type from a Content-Type header.
+     *
+     * @param string $contentType The Content-Type header value.
+     *
+     * @return string The mime type.
+     */
+    public function getMimeTypeFromHeader($contentType)
+    {
+        $paramPos = strpos($contentType, ';');
+        // No optional paramaters.
+        if ($paramPos === false) {
+            return strtolower(trim($contentType));
+        }
+
+        return strtolower(trim(substr($contentType, 0, $paramPos)));
     }
 }
