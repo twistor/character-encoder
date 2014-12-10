@@ -9,7 +9,6 @@ php:
 
 before_script:
   - composer install --prefer-dist --dev --no-interaction
-  - composer require phpunit/phpunit=4.4.*
 
 script:
   - mkdir -p build/logs
