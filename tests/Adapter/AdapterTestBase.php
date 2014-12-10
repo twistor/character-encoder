@@ -8,7 +8,7 @@
 namespace CharacterEncoder\Tests\Adapter;
 
 /**
- * @covers \CharacterEncoder\Adapter\MbString
+ * Each encoder uses the same test class to ensure behavior is consistent.
  */
 abstract class AdapterTestBase extends \PHPUnit_Framework_TestCase
 {
@@ -38,6 +38,15 @@ abstract class AdapterTestBase extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests that invalid endodings don't give an error.
+     */
+    public function testCheckInvalid()
+    {
+        $adapter = $this->newAdapter();
+        $this->assertSame(false, $adapter->check('abcd', 'INVALID'));
+    }
+
+    /**
      * Tests character conversion.
      *
      * @dataProvider textProvder
@@ -49,6 +58,15 @@ abstract class AdapterTestBase extends \PHPUnit_Framework_TestCase
         $expected = mb_convert_encoding($string, 'utf-8', $encoding);
         $output = $adapter->convert($string, $encoding, 'utf-8');
         $this->assertSame($expected, $output);
+    }
+
+    /**
+     * Tests that invalid endodings don't give an error.
+     */
+    public function testCheckConvert()
+    {
+        $adapter = $this->newAdapter();
+        $this->assertSame('', $adapter->convert('abcd', 'INVALID', 'INVALID'));
     }
 
     /**

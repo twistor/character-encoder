@@ -22,8 +22,8 @@ class Recode implements Adapter
         $to = strtolower($encoding) !== 'utf-8' ? 'utf-8' : 'utf-16';
 
         // Reuse the same variable to attempt to keep the memory usage down.
-        $encoded = recode_string($encoding.'..'.$to, $string);
-        $encoded = recode_string($to.'..'.$encoding, $encoded);
+        $encoded = @recode_string($encoding.'..'.$to, $string);
+        $encoded = @recode_string($to.'..'.$encoding, $encoded);
 
         return $encoded === $string;
     }
@@ -33,6 +33,6 @@ class Recode implements Adapter
      */
     public function convert($string, $from, $to)
     {
-        return recode_string($from.'..'.$to, $string);
+        return (string) @recode_string($from.'..'.$to, $string);
     }
 }

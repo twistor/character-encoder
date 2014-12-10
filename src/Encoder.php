@@ -28,7 +28,7 @@ class Encoder
         "\x2B\x2F\x76\x2B" => 'UTF-7',
         "\x2B\x2F\x76\x2F" => 'UTF-7',
         "\xDD\x73\x66\x73" => 'UTF-EBCDIC',
-        "\x00\x00\xFE\xFF" => 'GB18030',
+        "\x84\x31\x95\x33" => 'GB18030',
         "\xEF\xBB\xBF" => 'UTF-8',
         "\xF7\x64\x4C" => 'UTF-1',
         "\x0E\xFE\xFF" => 'SCSU',
@@ -183,28 +183,25 @@ class Encoder
      */
     public function detectStream($stream, $length = 524288, $contentType = '')
     {
-        // Only read from stream once.
-        $string = FALSE;
+        $bom = $this->getBomFromStream($stream);
+        $string = fread($stream, $length);
+        fseek($stream, 0);
 
-        // Check the BOM encoding first, if it exists.
-        if ($bom = $this->getBomFromStream($stream)) {
+        // According to RFC, we should check Content-Type before BOM.
+        if ($contentType && $charset = $this->getCharset($contentType)) {
+            if ($this->checkString($string, $charset)) {
+                return $charset;
+            }
+        }
+
+        if ($bom) {
             $encoding = static::$boms[$bom];
-
-            $string = fread($stream, $length);
-
             if ($this->checkString($string, $encoding)) {
                 return $encoding;
             }
         }
 
-        if ($string === FALSE) {
-            $string = fread($stream, $length);
-        }
-
-        $encoding = $this->detectString($string, $contentType);
-        fseek($stream, 0);
-
-        return $encoding;
+        return $this->detectString($string);
     }
 
     /**
@@ -260,7 +257,7 @@ class Encoder
             $test = substr($string, 0, $bom_len);
 
             if (isset(static::$boms[$test])) {
-                return static::$boms[$test];
+                return $test;
             }
         }
 

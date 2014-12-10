@@ -10,8 +10,8 @@ namespace CharacterEncoder;
 /**
  * Various lists of encodings.
  */
-class Encodings {
-
+class Encodings
+{
     /**
      * Common web encodings.
      *
@@ -76,21 +76,20 @@ class Encodings {
     /**
      * Returns common web encodings.
      *
-     * @return string[]
-     *   A list of common web encodings.
+     * @return string[] A list of common web encodings.
      */
-    public static function getCommonWebEncodings() {
+    public static function getCommonWebEncodings()
+    {
         return static::$commonWeb;
     }
 
     /**
      * Returns a large list of web encodings.
      *
-     * @return string[]
-     *   More web encodings.
+     * @return string[] More web encodings.
      */
-    public static function getUncommonWebEncodings() {
+    public static function getUncommonWebEncodings()
+    {
         return array_merge(static::$commonWeb, static::$lessCommonWeb);
     }
-
 }
