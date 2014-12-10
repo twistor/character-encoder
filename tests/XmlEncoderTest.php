@@ -29,27 +29,27 @@ XML;
         $this->assertSame('euc-jp', $xmlEncoder->getRfc3203Encoding($xml));
 
         // // Test application Content-Type.
-        $this->assertSame('ascii', $xmlEncoder->detectRfc3203Encoding($xml, 'application/xml; charset=ascii'));
-        $this->assertSame('ascii', $xmlEncoder->detectRfc3203Encoding($xml, 'application/test+xml; charset=ascii'));
+        $this->assertSame('ascii', $xmlEncoder->getRfc3203Encoding($xml, 'application/xml; charset=ascii'));
+        $this->assertSame('ascii', $xmlEncoder->getRfc3203Encoding($xml, 'application/test+xml; charset=ascii'));
 
-        $this->assertSame('ascii', $xmlEncoder->detectRfc3203Encoding($xml, 'text/xml; charset=ascii'));
-        $this->assertSame('ascii', $xmlEncoder->detectRfc3203Encoding($xml, 'text/test+xml; charset=ascii'));
-        $this->assertSame('us-ascii', $xmlEncoder->detectRfc3203Encoding($xml, 'text/plain'));
+        $this->assertSame('ascii', $xmlEncoder->getRfc3203Encoding($xml, 'text/xml; charset=ascii'));
+        $this->assertSame('ascii', $xmlEncoder->getRfc3203Encoding($xml, 'text/test+xml; charset=ascii'));
+        $this->assertSame('us-ascii', $xmlEncoder->getRfc3203Encoding($xml, 'text/plain'));
 
-        $this->assertSame('euc-jp', $xmlEncoder->detectRfc3203Encoding($xml, 'image/jpg'));
+        $this->assertSame('euc-jp', $xmlEncoder->getRfc3203Encoding($xml, 'image/jpg'));
 
         // Test with BOM sniffing.
         $utf32 = "\x00\x00\xFE\xFF".mb_convert_encoding(str_replace('EUC-JP', 'UTF-32BE', $xml), 'UTF-32BE', 'UTF-8');
-        $this->assertSame('utf-32be', $xmlEncoder->detectRfc3203Encoding($utf32));
+        $this->assertSame('utf-32be', $xmlEncoder->getRfc3203Encoding($utf32));
 
         // Test application Content-Type.
-        $this->assertSame('ascii', $xmlEncoder->detectRfc3203Encoding($utf32, 'application/xml; charset=ascii'));
-        $this->assertSame('ascii', $xmlEncoder->detectRfc3203Encoding($utf32, 'application/test+xml; charset=ascii'));
+        $this->assertSame('ascii', $xmlEncoder->getRfc3203Encoding($utf32, 'application/xml; charset=ascii'));
+        $this->assertSame('ascii', $xmlEncoder->getRfc3203Encoding($utf32, 'application/test+xml; charset=ascii'));
 
-        $this->assertSame('ascii', $xmlEncoder->detectRfc3203Encoding($utf32, 'text/xml; charset=ascii'));
-        $this->assertSame('ascii', $xmlEncoder->detectRfc3203Encoding($utf32, 'text/test+xml; charset=ascii'));
-        $this->assertSame('us-ascii', $xmlEncoder->detectRfc3203Encoding($utf32, 'text/plain'));
+        $this->assertSame('ascii', $xmlEncoder->getRfc3203Encoding($utf32, 'text/xml; charset=ascii'));
+        $this->assertSame('ascii', $xmlEncoder->getRfc3203Encoding($utf32, 'text/test+xml; charset=ascii'));
+        $this->assertSame('us-ascii', $xmlEncoder->getRfc3203Encoding($utf32, 'text/plain'));
 
-        $this->assertSame('utf-32be', $xmlEncoder->detectRfc3203Encoding($utf32, 'image/jpg'));
+        $this->assertSame('utf-32be', $xmlEncoder->getRfc3203Encoding($utf32, 'image/jpg'));
     }
 }
