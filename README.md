@@ -1,7 +1,7 @@
 character-encoder
 =================
 
-[![Build Status](https://travis-ci.org/twistor/character-encoder.svg?branch=master)](https://travis-ci.org/twistor/character-encoder)
+[![Build Status](https://img.shields.io/travis/twistor/character-encoder/master.svg?style=flat-square)](https://travis-ci.org/twistor/character-encoder)
 
 PHP library for detecting and converting character encodings.
 
