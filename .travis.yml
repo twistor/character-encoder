@@ -9,4 +9,4 @@ php:
 
 before_script:
   - composer install --prefer-dist --dev --no-interaction
-    - mkdir -p build/logs
+  - mkdir -p build/logs
