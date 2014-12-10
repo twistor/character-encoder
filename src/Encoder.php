@@ -7,60 +7,139 @@
 
 namespace CharacterEncoder;
 
+use CharacterEncoder\Adapter\Adapter;
+
 /**
- * Coverts character encodings.
+ * Converts character encodings.
  */
-interface Encoder
+class Encoder
 {
     /**
-     * Returns the current list of encodings being checked.
+     * A list of BOM (Byte order mark) identifiers mapped to their encoding.
+     *
+     * @var array
+     */
+    protected static $boms = array(
+        "\x2B\x2F\x76\x38\x2D" => 'UTF-7',
+        "\x00\x00\xFE\xFF" => 'UTF-32BE',
+        "\xFF\xFE\x00\x00" => 'UTF-32LE',
+        "\x2B\x2F\x76\x38" => 'UTF-7',
+        "\x2B\x2F\x76\x39" => 'UTF-7',
+        "\x2B\x2F\x76\x2B" => 'UTF-7',
+        "\x2B\x2F\x76\x2F" => 'UTF-7',
+        "\xDD\x73\x66\x73" => 'UTF-EBCDIC',
+        "\x00\x00\xFE\xFF" => 'GB18030',
+        "\xEF\xBB\xBF" => 'UTF-8',
+        "\xF7\x64\x4C" => 'UTF-1',
+        "\x0E\xFE\xFF" => 'SCSU',
+        "\xFB\xEE\x28" => 'BOCU-1',
+        "\xFE\xFF" => 'UTF-16BE',
+        "\xFF\xFE" => 'UTF-16LE',
+    );
+
+    /**
+     * The list of utf-8 compatible encodings.
+     *
+     * In the format array('encoding-name' => true).
+     *
+     * @todo Add other superset encodings.
+     *
+     * @var array
+     */
+    protected static $utf8Compatible = array(
+        'utf-8' => true,
+        'us-ascii' => true,
+        'ascii' => true,
+    );
+
+    /**
+     * The list of encodings to search through.
+     *
+     * @var []string
+     */
+    private $encodings = array();
+
+    /**
+     * The encoding adapter.
+     *
+     * @var \CharacterEncoder\Adapter
+     */
+    private $adapter;
+
+    /**
+     * Counstructs an Encoder object.
+     *
+     * @param Adapter $adapter The encoding adapter.
+     */
+    public function __construct(Adapter $adapter)
+    {
+        $this->adapter = $adapter;
+    }
+
+    /**
+     * Returns the current list of encodings being detected.
      *
      * @return []string A list of character encodings.
      */
-    public function getEncodings();
+    public function getEncodings()
+    {
+        return $this->encodings;
+    }
 
     /**
-     * Sets the list of character encodings to check.
+     * Sets the list of character encodings to use for detection.
      *
      * @param []string $encodings A list of character encodings.
      */
-    public function setEncodings(array $encodings);
+    public function setEncodings(array $encodings)
+    {
+        $this->encodings = array_unique(array_filter($encodings));
+    }
+
+    /**
+     * Checks the encoding of a given string.
+     *
+     * @param string $string   The string to check the encoding of.
+     * @param string $encoding The encoding to test.
+     *
+     * @return bool True if the encoding is valid, false if not.
+     */
+    public function checkString($string, $encoding)
+    {
+        return $this->adapter->check($string, $encoding);
+    }
 
     /**
      * Detects the encoding of a given string.
      *
-     * @param string $string The string to detect the encoding of.
+     * @param string $string      The string to detect the encoding of.
+     * @param string $contentType The Content-Type header value if available.
      *
      * @return string|bool The detected character encoding, or false if it couldn't be determined.
      */
-    public function detect($string);
+    public function detectString($string, $contentType = '')
+    {
+        // Try charset first.
+        if ($contentType && $charset = $this->getCharset($contentType)) {
+            if ($this->checkString($string, $charset)) {
+                return $charset;
+            }
+        }
+        foreach ($this->getEncodings() as $encoding) {
+            if ($this->checkString($string, $encoding)) {
+                return $encoding;
+            }
+        }
+
+        return false;
+    }
 
     /**
-     * Detects the encoding of a file.
-     *
-     * @param resource $handle A file handle.
-     * @param int      $length The length of file to read in bytes. Defaults to 0.5MB.
-     *
-     * @return string|bool The detected character encoding, or false if it couldn't be determined.
-     */
-    public function detectFile($handle, $length = 524288);
-
-    /**
-     * Checks that a string is a valid encoding.
-     *
-     * @param string $string   The string to check.
-     * @param string $encoding The encoding to check.
-     *
-     * @return bool True if the encoding is valid, false if not.
-     */
-    public function check($string, $encoding);
-
-    /**
-     * Converts a string from an encoding to an encoding.
+     * Converts a string from an encoding to another encoding.
      *
      * This doesn't do any verification of the encoding, so it's possible that
-     * the out will be garbled text. Use Encoder::detect() or Encoder::check()
-     * to verify an encoding.
+     * the out will be garbled text. Use Encoder::detectString() or
+     * Encoder::checkString() to verify the encoding before conversion.
      *
      * @param string $string The string to convert.
      * @param string $from   The encoding of the string.
@@ -68,34 +147,160 @@ interface Encoder
      *
      * @return string The encoded string.
      */
-    public function convert($string, $from, $to);
+    public function convertString($string, $from, $to)
+    {
+        return $this->adapter->convert($string, $from, $to);
+    }
 
     /**
-     * Converts a file from one encoding to another.
+     * Checks the encoding of a stream.
      *
-     * This returns a php://temp stream. To overwrite the existing file:
+     * @param resource $stream   A stream handle.
+     * @param string   $encoding The encoding to test.
+     * @param int      $length   The length of stream to read in bytes. Defaults to 524288 (0.5MB).
+     *
+     * @return bool True if the encoding is valid, false if not.
+     */
+    public function checkStream($stream, $encoding, $length = 524288)
+    {
+        // Skip the BOM if it exists.
+        $this->getBomFromStream($stream);
+
+        $valid = $this->checkString(fread($stream, $length), $encoding);
+        fseek($stream, 0);
+
+        return $valid;
+    }
+
+    /**
+     * Detects the encoding of a stream.
+     *
+     * @param resource $stream      A stream handle.
+     * @param int      $length      The number of bytes to read from the stream. Defaults to 524288 (0.5MB).
+     * @param string   $contentType The Content-Type header value if available.
+     *
+     * @return string|bool The detected character encoding, or false if it couldn't be determined.
+     */
+    public function detectStream($stream, $length = 524288, $contentType = '')
+    {
+        // Only read from stream once.
+        $string = FALSE;
+
+        // Check the BOM encoding first, if it exists.
+        if ($bom = $this->getBomFromStream($stream)) {
+            $encoding = static::$boms[$bom];
+
+            $string = fread($stream, $length);
+
+            if ($this->checkString($string, $encoding)) {
+                return $encoding;
+            }
+        }
+
+        if ($string === FALSE) {
+            $string = fread($stream, $length);
+        }
+
+        $encoding = $this->detectString($string, $contentType);
+        fseek($stream, 0);
+
+        return $encoding;
+    }
+
+    /**
+     * Converts a stream from one encoding to another.
+     *
+     * This returns a php://temp stream. To overwrite the existing stream:
      * @code
-     * $tmp = $encoder->convertFile($handle, $from, $to);
-     * ftruncate($handle, 0);
-     * stream_copy_to_stream($tmp, $handle);
+     * $tmp = $encoder->convertStream($stream, $from, $to);
+     * ftruncate($stream, 0);
+     * stream_copy_to_stream($tmp, $stream);
      * fclose($tmp);
      * @endcode
      *
      *
-     * @param resource $handle A file handle.
+     * @param resource $stream A stream handle.
      * @param string   $from   The encoding of the string.
      * @param string   $to     The desired encoding of the string.
      *
-     * @return resource A new file handle with the encoded text.
+     * @return resource A new stream handle with the encoded text.
      */
-    public function convertFile($handle, $from, $to);
+    public function convertStream($stream, $from, $to)
+    {
+        // Skip the BOM if it exists.
+        $this->getBomFromStream($stream);
+
+        // The output stream.
+        $output = fopen('php://temp', 'w+');
+
+        // Encode one line at a time.
+        // We can't just read a big buffer of bytes since it might split in the
+        // middle of a multi-byte character. Newline is safe to split on.
+        while ($buffer = fgets($stream)) {
+            fwrite($output, $this->convertString($buffer, $from, $to));
+        }
+
+        fseek($stream, 0);
+        fseek($output, 0);
+
+        return $output;
+    }
 
     /**
-     * Converts a string to utf-8.
+     * Returns the BOM (Byte order mark) from a string.
      *
-     * @param string $string The string to convert.
+     * @param string $string A string.
      *
-     * @return string|bool The encoded string, or false if the conversion failed.
+     * @return string|bool The BOM identifier, or false if one wasn't found.
      */
-    public function toUtf8($string);
+    protected function getBomFromString($string)
+    {
+        // Search for a BOM signature from largest to smallest.
+        foreach (range(5, 2) as $bom_len) {
+            $test = substr($string, 0, $bom_len);
+
+            if (isset(static::$boms[$test])) {
+                return static::$boms[$test];
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns the BOM (Byte order mark) from a stream.
+     *
+     * If a BOM was found, the stream will be positioned immediately after it.
+     *
+     * @param resource $stream A stream.
+     *
+     * @return string|bool The BOM identifier, or false if one wasn't found.
+     */
+    protected function getBomFromStream($stream)
+    {
+        fseek($stream, 0);
+        $bom = $this->getBomFromString(fread($stream, 5));
+
+        $bom ? fseek($stream, strlen($bom)) : fseek($stream, 0);
+
+        return $bom;
+    }
+
+    /**
+     * Returns the character set from a Content-Type header
+     *
+     * text/html; charset=utf-8
+     *
+     * @param string $contentType The Content-Type header string.
+     *
+     * @return string|bool The charset, or false if not found.
+     */
+    protected function getCharset($contentType)
+    {
+        if (preg_match('/charset\s*=\s*(.*)\b/', $contentType, $matches)) {
+            return $matches[1];
+        }
+
+        return false;
+    }
 }

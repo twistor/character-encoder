@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Contains \CharacterEncoder\NoopEncoder.
+ * Contains \CharacterEncoder\Adapter\Noop.
  */
 
-namespace CharacterEncoder;
+namespace CharacterEncoder\Adapter;
 
 /**
- * Stub character converter thas does nothing.
+ * Stub adapter thas does nothing.
  */
-class NoopEncoder extends EncoderBase
+class Noop implements Adapter
 {
     /**
      * {@inheritdoc}

@@ -7,6 +7,11 @@
 
 namespace CharacterEncoder;
 
+use CharacterEncoder\Adapter\Iconv;
+use CharacterEncoder\Adapter\MbString;
+use CharacterEncoder\Adapter\Noop;
+use CharacterEncoder\Adapter\Recode;
+
 /**
  * Factory used to detect the best encoder.
  */
@@ -22,18 +27,19 @@ class EncoderFactory
     public static function create(array $encoding_list = array())
     {
         if (extension_loaded('mbstring')) {
-            $encoder = new MbEncoder();
+            $adapter = new MbString();
         }
         // @codeCoverageIgnoreStart
         elseif (extension_loaded('iconv')) {
-            $encoder = new IconvEncoder();
+            $adapter = new Iconv();
         } elseif (extension_loaded('recode')) {
-            $encoder = new RecodeEncoder();
+            $adapter = new Recode();
         } else {
-            $encoder = new NoopEncoder();
+            $adapter = new Noop();
         }
         // @codeCoverageIgnoreEnd
 
+        $encoder = new Encoder($adapter);
         $encoder->setEncodings($encoding_list);
 
         return $encoder;

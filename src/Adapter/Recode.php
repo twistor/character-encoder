@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Contains \CharacterEncoder\RecodeEncoder.
+ * Contains \CharacterEncoder\Adapter\Recode.
  */
 
-namespace CharacterEncoder;
+namespace CharacterEncoder\Adapter;
 
 /**
- * Character encoding using the recode extension.
+ * Encoding adapter using the recode extension.
  */
-class RecodeEncoder extends EncoderBase
+class Recode implements Adapter
 {
     /**
      * {@inheritdoc}

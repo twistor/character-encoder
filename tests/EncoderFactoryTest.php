@@ -20,5 +20,6 @@ class EncoderFactoryTest extends \PHPUnit_Framework_TestCase
     public function test()
     {
         $encoder = EncoderFactory::create(array());
+        $this->assertInstanceOf('CharacterEncoder\Encoder', $encoder);
     }
 }

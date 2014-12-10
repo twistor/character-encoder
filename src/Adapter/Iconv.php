@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Contains \CharacterEncoder\IconvEncoder.
+ * Contains \CharacterEncoder\Adapter\Iconv.
  */
 
-namespace CharacterEncoder;
+namespace CharacterEncoder\Adapter;
 
 /**
- * Character encoding using the iconv extension.
+ * Encoding adapter using the iconv extension.
  */
-class IconvEncoder extends EncoderBase
+class Iconv implements Adapter
 {
     /**
      * {@inheritdoc}
