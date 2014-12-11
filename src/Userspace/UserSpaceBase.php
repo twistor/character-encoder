@@ -2,8 +2,8 @@
 
 namespace CharacterEncoder\Userspace;
 
-class UserspaceBase {
-
+class UserSpaceBase
+{
     protected static $cache = array();
 
     public function readResource($label)

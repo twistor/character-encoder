@@ -2,8 +2,8 @@
 
 namespace CharacterEncoder\Userspace;
 
-class SingleByteDecoder extends UserSpaceBase {
-
+class SingleByteDecoder extends UserSpaceBase
+{
     protected static $cache = array();
 
     public function decode($string, $label)
@@ -22,7 +22,6 @@ class SingleByteDecoder extends UserSpaceBase {
 
             if ($value < 0x80) {
                 $output[$i] = $value;
-
             } else {
                 $value = $value ^ 0x80;
                 if (isset($index[$value])) {
@@ -31,7 +30,6 @@ class SingleByteDecoder extends UserSpaceBase {
                     throw new \InvalidArgumentException();
                 }
             }
-
         }
 
         return $output;
@@ -45,10 +43,8 @@ class SingleByteDecoder extends UserSpaceBase {
         foreach ($stream as $token) {
             if ($token < 0x80) {
                 $output .= chr($token);
-
             } elseif (isset($index[$token])) {
                 $output .= chr(0x80 | $index[$token]);
-
             } else {
                 throw new \InvalidArgumentException();
             }

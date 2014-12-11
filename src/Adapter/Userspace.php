@@ -57,7 +57,7 @@ class Userspace implements Adapter
         }
 
         if (isset(static::$cyrillic[$to]) && isset(static::$cyrillic[$from])) {
-            return convert_cyr_string($str , $from , $to);
+            return convert_cyr_string($str, $from, $to);
         }
     }
 }

@@ -17,7 +17,8 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider encodingProvider
      */
-    public function testReadResource($encoding) {
+    public function testReadResource($encoding)
+    {
         $decoder = new SingleByteDecoder();
 
         // Read the file.

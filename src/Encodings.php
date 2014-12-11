@@ -108,6 +108,7 @@ class Encodings
         $original = $label = strtolower($label);
         $label = preg_replace('/[^a-zA-Z0-9]/', '', $label);
         $label = preg_replace('/(?<!\d)0+/', '', $label);
+
         return isset(static::$normalizations[$label]) ? static::$normalizations[$label] : $original;
     }
 
