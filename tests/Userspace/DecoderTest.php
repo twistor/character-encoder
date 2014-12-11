@@ -28,8 +28,9 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
         $stream = $decoder->decode($string, $encoding);
 
         $utf8 = mb_convert_encoding($string, 'utf-8', $encoding);
+        $utf8Encoder = new Utf8();
 
-        $this->assertSame($utf8, (new Utf8())->encode($stream));
+        $this->assertSame($utf8, $utf8Encoder->encode($stream));
 
         // Re-encode the unicode stream.
         $encoded = $decoder->encode($stream, $encoding);
