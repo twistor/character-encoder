@@ -90,7 +90,8 @@ class XmlEncoder extends Encoder
      *
      * @param \CharacterEncoder\Encoder $encoder The encoder.
      */
-    public function __construct(Encoder $encoder) {
+    public function __construct(Encoder $encoder)
+    {
         $this->encoder = $encoder;
     }
 
@@ -160,6 +161,7 @@ class XmlEncoder extends Encoder
     private function getXmlEncodingHint($string)
     {
         $start = substr($string, 0, 4);
+
         return isset(static::$xmlPreables[$start]) ? static::$xmlPreables[$start] : '';
     }
 

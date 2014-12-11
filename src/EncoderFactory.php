@@ -28,6 +28,7 @@ class EncoderFactory
     {
         $encoder = new Encoder(static::getAdapter());
         $encoder->setEncodings($encoding_list);
+
         return $encoder;
     }
 
@@ -38,11 +39,12 @@ class EncoderFactory
      *
      * @return \CharacterEncoder\Encoder A character encoder.
      */
-    public static function createXmlEncoder(Encoder $encoder = NULL)
+    public static function createXmlEncoder(Encoder $encoder = null)
     {
         if (!$encoder) {
             $encoder = static::create();
         }
+
         return new XmlEncoder();
     }
 
