@@ -1,0 +1,161 @@
+<?php
+
+namespace CharacterEncoder\Userspace;
+
+class Gb18030 extends UserSpaceBase
+{
+    public function decode($string, $encoding)
+    {
+        $handle = fopen(dirname(dirname(dirname(__FILE__))).'/resources/index-gb18030-ranges.txt', 'r');
+        $ranges = array();
+        $this->readFile($handle, $ranges);
+
+        $index = $this->readResource('gb18030');
+
+        $first = $second = $third = 0x00;
+        $output = array();
+
+        $len = strlen($string);
+        $output = array();
+
+        for ($i = 0; $i < $len; $i++) {
+            $byte = ord($string[$i]);
+
+            if ($third !== 0x00) {
+                $codepoint = null;
+                if ($byte >= 0x30 && $byte <= 0x39) {
+                    $pointer = ((($first - 0x81) * 10 + $second - 0x30) * 126 + $third - 0x81) * 10 + $byte - 0x30;
+
+                    if (($pointer > 39419 && $pointer < 189000) || $pointer > 1237575) {
+                        throw new \InvalidArgumentException();
+                    }
+                    $range = $pointer;
+
+                    do {
+                        $offset = isset($ranges[$range]) ? $range : false;
+                        $range--;
+                    } while ($offset === false && $range);
+
+                    $output[] = $ranges[$offset] + $pointer - $offset;
+                    $first = $second = $third = 0x00;
+                }
+            } elseif ($second !== 0x00) {
+                if ($byte >= 0x81 && $byte <= 0xFE) {
+                    $third = $byte;
+                    continue;
+                }
+                throw new \InvalidArgumentException();
+            } elseif ($first !== 0x00) {
+                if ($byte >= 0x30 && $byte <= 0x39) {
+                    $second = $byte;
+                    continue;
+                }
+                $lead = $first;
+                $pointer = null;
+                $first = 0x00;
+
+                if ($byte < 0x7F) {
+                    $offset = 0x40;
+                } else {
+                    $offset = 0x41;
+                }
+
+                if (($byte >= 0x40 && $byte <= 0x7E) || ($byte >= 0x80 && $byte <= 0xFE)) {
+                    $pointer = ($lead - 0x81) * 190 + ($byte - $offset);
+                }
+
+                if (!isset($pointer)) {
+                    throw new \InvalidArgumentException();
+                } else {
+                    $output[] = $index[$pointer];
+                }
+            } elseif ($byte >= 0x00 && $byte <= 0x7F) {
+                $output[] = $byte;
+            } elseif ($byte === 0x80) {
+                $output[] = 8364;
+            } elseif ($byte >= 0x81 && $byte <= 0xFE) {
+                $first = $byte;
+            } else {
+                throw new \InvalidArgumentException();
+            }
+        }
+
+        if ($first !== 0x00 || $second !== 0x00 || $third !== 0x00) {
+            throw new \InvalidArgumentException();
+        }
+
+        return $output;
+    }
+
+    public function encode($codepoints, $encoding)
+    {
+        $handle = fopen(dirname(dirname(dirname(__FILE__))).'/resources/index-gb18030-ranges.txt', 'r');
+        $ranges = array();
+        $this->readFile($handle, $ranges);
+        $ranges = array_flip($ranges);
+
+        $index = array_flip($this->readResource('gb18030'));
+
+        $output = '';
+        $gbk = false;
+        foreach ($codepoints as $codepoint) {
+            if ($codepoint >= 0x00 && $codepoint <= 0x7F) {
+                $output .= chr($codepoint);
+                continue;
+            }
+
+            // Euro symbol U+20AC.
+            if ($gbk && $codepoint === 8364) {
+                $output .= chr(0x80);
+                continue;
+            }
+
+            if (isset($index[$codepoint])) {
+                $pointer = $index[$codepoint];
+
+                $lead =  $pointer / 190 + 0x81;
+                $trail = $pointer % 190;
+                $offset = $trail < 0x3F ? 0x40 : 0x41;
+
+                $output .= chr($lead).chr($trail + $offset);
+                continue;
+            }
+            if ($gbk) {
+                throw new \InvalidArgumentException();
+            }
+
+            $pointer = $this->getRangesPointer($ranges, $codepoint);
+
+            $byte1 = $pointer / 10 / 126 / 10;
+            $pointer = $pointer - $byte1 * 10 * 126 * 10;
+            $byte2 = $pointer / 10 / 126;
+            $pointer = $pointer - $byte2 * 10 * 126;
+            $byte3 = $pointer / 10;
+            $byte4 = $pointer - $byte3 * 10;
+
+            $output .= chr($byte1 + 0x81).
+                       chr($byte2 + 0x30).
+                       chr($byte3 + 0x81).
+                       chr($byte4 + 0x30);
+        }
+
+        return $output;
+    }
+
+    protected function getRangesPointer(array $ranges, $codepoint)
+    {
+        $offset = $codepoint;
+
+        while ($offset) {
+            $pointerOffset = isset($ranges[$offset]) ? $ranges[$offset] : false;
+
+            if ($pointerOffset !== false) {
+                break;
+            }
+            $offset--;
+        }
+
+        return $pointerOffset + $codepoint - $offset;
+    }
+
+}
