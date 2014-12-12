@@ -27,7 +27,7 @@ class Gb18030Test extends \PHPUnit_Framework_TestCase
         $this->assertSame(mb_strlen($string, 'gb18030'), count($stream));
 
         // Re-encode the unicode stream.
-        // $encoded = $decoder->encode($stream, 'gb18030');
-        // $this->assertSame($string, $encoded);
+        $encoded = $decoder->encode($stream, 'gb18030');
+        $this->assertSame($string, $encoded);
     }
 }

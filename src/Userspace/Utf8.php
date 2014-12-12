@@ -96,14 +96,12 @@ class Utf8
                 throw new \InvalidArgumentException();
             }
 
-            $bytes = chr(($codepoint >> (6 * $count)) + $offset);
+            $output .= chr(($codepoint >> (6 * $count)) + $offset);
 
             while ($count) {
                 $count--;
-                $bytes .=  chr(0x80 | ($codepoint >> (6 * ($count)) & 0x3F));
+                $output .=  chr(0x80 | ($codepoint >> (6 * ($count)) & 0x3F));
             }
-
-            $output .= $bytes;
         }
 
         return $output;
